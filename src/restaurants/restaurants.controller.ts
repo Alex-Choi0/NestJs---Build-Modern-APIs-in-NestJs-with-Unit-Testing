@@ -6,8 +6,10 @@ import {
   Param,
   Post,
   Put,
+  Query,
 } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Query as ExpressQuery } from 'express-serve-static-core';
 import { Restaurant } from 'src/schemas/restaurant.schema';
 import { CreateResturantDto } from './dto/create-restaurant.dto';
 import { UpdateResturantDto } from './dto/update-restaurant.dto';
@@ -23,8 +25,18 @@ export class RestaurantsController {
     summary: 'call all the restaurant',
     description: '모든 레스트로랑을 불러온다',
   })
-  async getAllRestaurants(): Promise<Restaurant[]> {
-    return this.restaurantsService.findAll();
+  @ApiQuery({
+    description: 'keyword검색',
+    name: 'keyword',
+    example: 'hello',
+  })
+  @ApiQuery({
+    description: 'keyword검색',
+    name: 'page',
+    example: '0',
+  })
+  async getAllRestaurants(@Query() query: ExpressQuery): Promise<Restaurant[]> {
+    return this.restaurantsService.findAll(query);
   }
 
   // example Body
