@@ -7,10 +7,18 @@ import {
   Post,
   Put,
   Query,
-  UsePipes,
-  ValidationPipe,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import {
+  ApiBody,
+  ApiConsumes,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
 import { Query as ExpressQuery } from 'express-serve-static-core';
 import { Restaurant } from 'src/schemas/restaurant.schema';
 import { CreateResturantDto } from './dto/create-restaurant.dto';
@@ -97,13 +105,49 @@ export class RestaurantsController {
   async deleteRestaurant(
     @Param('id') id: string,
   ): Promise<{ deleted: Boolean }> {
-    await this.restaurantsService.findById(id);
-    const res = await this.restaurantsService.deleteById(id);
-
-    if (res) {
+    const restaurant = await this.restaurantsService.findById(id);
+    console.log('Deleting Restaurant : ', restaurant);
+    const isDeleted = await this.restaurantsService.deleteImages(
+      restaurant.images,
+    );
+    if (isDeleted) {
+      const res = await this.restaurantsService.deleteById(id);
       return {
         deleted: true,
       };
+    } else {
+      return {
+        deleted: false,
+      };
     }
+  }
+
+  @Put('upload/:id')
+  @ApiOperation({ summary: '파일을 서버쪽으로 upload' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    type: 'multipart/form-data',
+    schema: {
+      type: 'object',
+      properties: {
+        files: {
+          type: 'array',
+          items: {
+            type: 'string',
+            format: 'binary',
+          },
+        },
+      },
+    },
+  })
+  @UseInterceptors(FilesInterceptor('files'))
+  async uploadFiles(
+    @Param('id') id: string,
+    @UploadedFiles() files: Array<Express.Multer.File>,
+  ) {
+    await this.restaurantsService.findById(id);
+
+    const res = await this.restaurantsService.uploadImages(id, files);
+    return res;
   }
 }
