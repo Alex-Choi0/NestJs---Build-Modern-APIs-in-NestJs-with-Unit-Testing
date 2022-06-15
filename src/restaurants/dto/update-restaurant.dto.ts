@@ -1,11 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsEmail,
+  IsEmpty,
   IsEnum,
   IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
+import { User } from 'src/auth/schemas/user.schema';
 import { Category } from 'src/schemas/restaurant.schema';
 
 export class UpdateResturantDto {
@@ -62,4 +64,7 @@ export class UpdateResturantDto {
   @IsEnum(Category, { message: 'Please enter correct category' })
   @IsOptional()
   readonly category?: Category;
+
+  @IsEmpty({ message: 'You cannot provide the user ID.' })
+  readonly user: User;
 }

@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
+import mongoose from 'mongoose';
+import { User } from 'src/auth/schemas/user.schema';
 
 @Schema()
 export class Location {
@@ -97,6 +99,9 @@ export class Restaurant {
     `,
   })
   Location?: Location;
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  user: User;
 }
 
 export const RestaurantSchema = SchemaFactory.createForClass(Restaurant);
