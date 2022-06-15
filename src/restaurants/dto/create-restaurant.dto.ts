@@ -1,5 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+} from 'class-validator';
 import { Category } from 'src/schemas/restaurant.schema';
 
 export class CreateResturantDto {
@@ -27,7 +33,7 @@ export class CreateResturantDto {
     example: '알렉스@gmail.com',
   })
   @IsNotEmpty()
-  @IsEmail({}, {message : 'Please enter correct email address'})
+  @IsEmail({}, { message: 'Please enter correct email address' })
   readonly email: string;
 
   @ApiProperty({
@@ -42,7 +48,7 @@ export class CreateResturantDto {
   @ApiProperty({
     required: true,
     description: '주소',
-    example: '서울 강남구',
+    example: '125 Hawdon Ct, Howlong NSW 2643 Australia',
   })
   @IsNotEmpty()
   @IsString()
@@ -51,9 +57,9 @@ export class CreateResturantDto {
   @ApiProperty({
     required: true,
     description: '카테고리',
-    example: '카테고리',
+    example: 'Fine Dinning',
   })
   @IsNotEmpty()
-  @IsEnum(Category, {message : 'Please enter correct category'})
+  @IsEnum(Category, { message: 'Please enter correct category' })
   readonly category: Category;
 }
