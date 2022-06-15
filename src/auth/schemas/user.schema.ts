@@ -19,7 +19,7 @@ export class User extends Document {
 
   @Prop({
     enum: UserRoles,
-    defalult: UserRoles.USER,
+    default: UserRoles.USER,
   })
   role: UserRoles;
 }
