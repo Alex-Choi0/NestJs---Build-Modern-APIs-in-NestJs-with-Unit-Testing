@@ -1,9 +1,12 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'; // DocumentBuilder import
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.useGlobalPipes(new ValidationPipe())
+  // app.setGlobalPrefix('api')
   // Swagger Document를 설정
   const options = new DocumentBuilder()
     .setTitle('nest API')
