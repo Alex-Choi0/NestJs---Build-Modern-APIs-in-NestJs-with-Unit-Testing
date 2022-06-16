@@ -1,5 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
+import mongoose from 'mongoose';
+import { User } from 'src/auth/schemas/user.schema';
+import { Meal } from 'src/meal/schemas/meal.schema';
 
 @Schema()
 export class Location {
@@ -28,7 +31,9 @@ export enum Category {
   FINE_DINNING = 'Fine Dinning',
 }
 
-@Schema()
+@Schema({
+  timestamps: true,
+})
 export class Restaurant {
   @Prop()
   @ApiProperty({
@@ -97,6 +102,12 @@ export class Restaurant {
     `,
   })
   Location?: Location;
+
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User' })
+  user: User;
+
+  @Prop([{ type: mongoose.Schema.Types.ObjectId, ref: 'Meal' }])
+  menu?: Meal[];
 }
 
 export const RestaurantSchema = SchemaFactory.createForClass(Restaurant);
