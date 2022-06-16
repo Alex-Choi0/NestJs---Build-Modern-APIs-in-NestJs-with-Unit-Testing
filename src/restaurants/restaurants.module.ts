@@ -14,5 +14,6 @@ import { RestaurantsService } from './restaurants.service';
       { name: 'Restaurant', schema: RestaurantSchema },
     ]),
   ],
+  exports: [MongooseModule],
 })
 export class RestaurantsModule {}

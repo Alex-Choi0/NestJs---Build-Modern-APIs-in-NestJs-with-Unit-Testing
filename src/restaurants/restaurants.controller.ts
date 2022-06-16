@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   Param,
   Post,
@@ -100,29 +101,41 @@ export class RestaurantsController {
   }
 
   @Put(':id')
+  @UseGuards(AuthGuard(), RolesGuard)
+  @Roles('admin', 'user')
   @ApiOperation({
     description: '레스트로랑 업데이트 하기',
     summary: 'update restaurant',
   })
   @ApiParam({ name: 'id', example: '62a81f1564a7181cda257c71' })
+  @ApiBearerAuth()
   async updateRestaurant(
     @Param('id') id: string,
     @Body() restaurant: UpdateResturantDto,
+    @CurrentUser() user: User,
   ): Promise<Restaurant> {
-    await this.restaurantsService.findById(id);
+    const res = await this.restaurantsService.findById(id);
+    if (res.user.toString() !== user._id.toString())
+      throw new ForbiddenException('You can not update this restaurant.');
     return await this.restaurantsService.updateById(id, restaurant);
   }
 
   @Delete(':id')
+  @UseGuards(AuthGuard(), RolesGuard)
+  @Roles('admin', 'user')
   @ApiParam({
     name: 'id',
     example: '62a81f1564a7181cda257c71',
     description: '삭제할 레스트로랑의 id',
   })
+  @ApiBearerAuth()
   async deleteRestaurant(
     @Param('id') id: string,
+    @CurrentUser() user: User,
   ): Promise<{ deleted: Boolean }> {
     const restaurant = await this.restaurantsService.findById(id);
+    if (restaurant.user.toString() !== user._id.toString())
+      throw new ForbiddenException('You can not update this restaurant.');
     console.log('Deleting Restaurant : ', restaurant);
     const isDeleted = await this.restaurantsService.deleteImages(
       restaurant.images,
@@ -140,6 +153,8 @@ export class RestaurantsController {
   }
 
   @Put('upload/:id')
+  @UseGuards(AuthGuard(), RolesGuard)
+  @Roles('admin', 'user')
   @ApiOperation({ summary: '파일을 서버쪽으로 upload' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -158,12 +173,15 @@ export class RestaurantsController {
     },
   })
   @UseInterceptors(FilesInterceptor('files'))
+  @ApiBearerAuth()
   async uploadFiles(
     @Param('id') id: string,
     @UploadedFiles() files: Array<Express.Multer.File>,
+    @CurrentUser() user: User,
   ) {
-    await this.restaurantsService.findById(id);
-
+    const restaurant = await this.restaurantsService.findById(id);
+    if (restaurant.user.toString() !== user._id.toString())
+      throw new ForbiddenException('You can not update this restaurant.');
     const res = await this.restaurantsService.uploadImages(id, files);
     return res;
   }
