@@ -1,6 +1,27 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 
+@Schema()
+export class Location {
+  @Prop({ type: String, enum: ['Point'] })
+  type: string;
+
+  @Prop({ index: '2dsphere' })
+  coordinates: Number[];
+
+  @Prop({})
+  formattedAddress: string;
+
+  @Prop({})
+  city: string;
+
+  @Prop()
+  zipcode: string;
+
+  @Prop()
+  countryCode: string;
+}
+
 export enum Category {
   FAST_FOOD = 'fast Food',
   CAFE = 'Cafe',
@@ -57,6 +78,25 @@ export class Restaurant {
     example: ['https:s3//'],
   })
   images?: object[];
+
+  @Prop({ type: Object, ref: 'Location' })
+  @ApiProperty({
+    description: '레스토랑 주소 정보',
+    example: `
+    "Location": {
+    "type": "Point",
+    "coordinates": [
+      146.6359,
+      -35.98241
+    ],
+    "formattedAddress": "125 Hawdon Court, Howlong, New South Wales 2643, AU",
+    "city": "Howlong",
+    "countryCode": "AU",
+    "zipcode": "2643"
+  }
+    `,
+  })
+  Location?: Location;
 }
 
 export const RestaurantSchema = SchemaFactory.createForClass(Restaurant);

@@ -1,8 +1,13 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Query } from 'express-serve-static-core';
 import mongoose from 'mongoose';
 import { Restaurant } from 'src/schemas/restaurant.schema';
+import APIFeatures from 'src/utils/apiFeatures.utils';
 import { UpdateResturantDto } from './dto/update-restaurant.dto';
 
 @Injectable()
@@ -36,7 +41,13 @@ export class RestaurantsService {
 
   // Create new Restaurant => POST /restaurants
   async create(restaurant: Restaurant): Promise<Restaurant> {
-    const res = await this.restaurantModel.create(restaurant);
+    const Location = await APIFeatures.getRestaurantLocation(
+      restaurant.address,
+    );
+    console.log('Location Info : ', Location);
+    const data = Object.assign(restaurant, { Location });
+    console.log('data :', data);
+    const res = await this.restaurantModel.create(data);
     return res;
   }
 
@@ -44,7 +55,10 @@ export class RestaurantsService {
   async findById(id: string): Promise<Restaurant> {
     const isValidId = mongoose.isValidObjectId(id);
 
-    if(!isValidId) throw new BadRequestException('Wrong mongoose ID Error, Please enter correct ID')
+    if (!isValidId)
+      throw new BadRequestException(
+        'Wrong mongoose ID Error, Please enter correct ID',
+      );
 
     const res = await this.restaurantModel.findById(id);
     if (!res) throw new NotFoundException('Restaurant not found');
