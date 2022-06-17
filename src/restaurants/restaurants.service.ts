@@ -42,6 +42,7 @@ export class RestaurantsService {
 
   // Create new Restaurant => POST /restaurants
   async create(restaurant: Restaurant, user: User): Promise<Restaurant> {
+    console.log('addrsess : ', restaurant.address);
     const Location = await APIFeatures.getRestaurantLocation(
       restaurant.address,
     );
@@ -55,7 +56,7 @@ export class RestaurantsService {
   // Get a restaurant by ID => GET /restaurant/:id
   async findById(id: string): Promise<Restaurant> {
     const isValidId = mongoose.isValidObjectId(id);
-
+    console.log('isValidId : ', isValidId);
     if (!isValidId)
       throw new BadRequestException(
         'Wrong mongoose ID Error, Please enter correct ID',

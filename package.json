@@ -69,6 +69,13 @@
     "typescript": "^4.3.5"
   },
   "jest": {
+    "modulePaths": [
+      "node_modules",
+      "src"
+    ],
+    "moduleNameMapper": {
+      "^src/(.*)$": "<rootDir>/$1"
+    },
     "moduleFileExtensions": [
       "js",
       "json",
