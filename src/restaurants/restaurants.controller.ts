@@ -57,9 +57,9 @@ export class RestaurantsController {
   @ApiBearerAuth()
   async getAllRestaurants(
     @Query() query: ExpressQuery,
-    @CurrentUser() user: User, // use customdecorator to check user infomation
+    // @CurrentUser() user: User, // use customdecorator to check user infomation
   ): Promise<Restaurant[]> {
-    console.log('get user info by customdecorator : ', user);
+    // console.log('get user info by customdecorator : ', user);
     return this.restaurantsService.findAll(query);
   }
 
@@ -115,6 +115,8 @@ export class RestaurantsController {
     @CurrentUser() user: User,
   ): Promise<Restaurant> {
     const res = await this.restaurantsService.findById(id);
+    console.log('res data(updateRestaurant) : ', res);
+    console.log('Input userId(updateRestaurant) : ', user._id);
     if (res.user.toString() !== user._id.toString())
       throw new ForbiddenException('You can not update this restaurant.');
     return await this.restaurantsService.updateById(id, restaurant);
@@ -141,7 +143,6 @@ export class RestaurantsController {
       restaurant.images,
     );
     if (isDeleted) {
-      const res = await this.restaurantsService.deleteById(id);
       return {
         deleted: true,
       };
