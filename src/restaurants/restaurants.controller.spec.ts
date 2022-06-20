@@ -63,6 +63,7 @@ const mockRestaurantService = {
   create: jest.fn(),
   updateById: jest.fn(),
   deleteImages: jest.fn(),
+  uploadImages: jest.fn(),
 };
 
 describe('RestaurantsController', () => {
@@ -193,7 +194,7 @@ describe('RestaurantsController', () => {
       ).rejects.toThrow(ForbiddenException);
     });
 
-    it('should delete images', async () => {
+    it('should delete restaurant', async () => {
       mockRestaurantService.findById = jest
         .fn()
         .mockResolvedValueOnce(mockRestaurant[0]);
@@ -219,6 +220,36 @@ describe('RestaurantsController', () => {
         mockUser as any,
       );
       expect(result).toEqual({ deleted: false });
+    });
+  });
+
+  describe('uploadFiles', () => {
+    it('should not upload this restaurant images', async () => {
+      mockRestaurantService.findById = jest
+        .fn()
+        .mockResolvedValueOnce(mockRestaurant[0]);
+      await expect(
+        controller.uploadFiles(
+          mockRestaurant[0]._id,
+          [] as any,
+          { ...mockUser, _id: 'wrong Id' } as any,
+        ),
+      ).rejects.toThrow(ForbiddenException);
+    });
+
+    it('should upload this restaurant images', async () => {
+      mockRestaurantService.findById = jest
+        .fn()
+        .mockResolvedValueOnce(mockRestaurant[0]);
+      mockRestaurantService.uploadImages = jest.fn().mockResolvedValueOnce([]);
+
+      const result = await controller.uploadFiles(
+        mockRestaurant[0]._id,
+        [],
+        mockUser as any,
+      );
+      expect(service.uploadImages).toHaveBeenCalled();
+      expect(result).toStrictEqual([]);
     });
   });
 });

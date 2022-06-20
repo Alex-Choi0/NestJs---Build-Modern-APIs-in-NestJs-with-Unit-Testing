@@ -42,7 +42,7 @@ export class AuthService {
       console.log(error);
       // Handle duplicate email
       if (error.code === 11000) {
-        throw new ConflictException(error.message);
+        throw new ConflictException('Duplicate Email entered.');
       }
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
